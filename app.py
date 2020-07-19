@@ -22,6 +22,11 @@ def scrape():
    mars.update({}, mars_data, upsert=True)
    return "Scraping Successful!"
 
+@app.route("/hemisphere")
+def hemisphere():
+    scraping.get_mars_hemisphere()
+    return "Hemisphere Scraping Successful!"
+
 if __name__ == "__main__":
    app.run()
 

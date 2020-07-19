@@ -87,6 +87,32 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
+
+def get_hemispheres(browser):
+    # browser = Browser("chrome", executable_path="chromedriver", headless=True)
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+    # Optional delay for loading the page
+    browser.is_element_present_by_css("div.collapsible.results", wait_time=1)
+    # Convert the browser html to a soup object and then quit the browser
+    html = browser.html
+    news_soup = soup(html, 'html.parser')
+    info= []
+    try:
+        all_hems = news_soup.find_all('div', class_='item')
+        for hem in all_hems:
+            d = {}
+            d["title"] = hem.h3.text
+            d["img_url"] = f"https://astrogeology.usgs.gov{hem.img['src']}"
+            d["full_url"] = f"https://astrogeology.usgs.gov{hem.a['href']}"
+            d["description"] = hem.p.text
+            info.append(d)    
+    except AttributeError:
+        return None
+
+    #return pd.DataFrame(info)
+    return info
+
     
 def scrape_all():
     # Initiate headless driver for deployment
@@ -98,12 +124,15 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
+        "hemispheres": get_hemispheres(browser),
         "last_modified": dt.datetime.now()
     }
     # Stop webdriver and return data
     browser.quit()
     return data
 
+
 if __name__ == "__main__":
     # If running as script, print scraped data
     print(scrape_all())
+    
