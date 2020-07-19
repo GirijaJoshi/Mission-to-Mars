@@ -20,7 +20,9 @@ def scrape():
    mars = mongo.db.mars
    mars_data = scraping.scrape_all()
    mars.update({}, mars_data, upsert=True)
-   return "Scraping Successful!"
+   # return "Scraping Successful!"
+   # return render_template("index.html", mars=mars)
+   return render_template("return.html", mars=mars)
 
 @app.route("/hemisphere")
 def hemisphere():
